@@ -3,10 +3,10 @@
 require_relative "wfc/version"
 
 pixels = [
-  [255, 255, 255, 255],
-  [255, 0, 0, 0],
-  [255, 0, 138, 0],
-  [255, 0, 0, 0]
+  [255, 255, 0, 138],
+  [255, 255, 0, 138],
+  [0, 138, 0, 255],
+  [0, 138, 0, 255]
 ]
 input_size = [4, 4]
 OUTPUT_SIZE = [50, 50].freeze
@@ -159,11 +159,11 @@ class Index
     end
   end
 
-  def add_rule(pattern: Pattern, relative_position: tuple, next_pattern: Pattern)
+  def add_rule(pattern:, relative_position:, next_pattern:)
     @data[pattern][relative_position].push(next_pattern)
   end
 
-  def check_possibility(pattern: Pattern, check_pattern: Pattern, relative_pos: tuple)
+  def check_possibility(pattern:, check_pattern:, relative_pos:)
     pattern = pattern[0] if pattern.is_a? Array
 
     @data[pattern][relative_pos].include? check_pattern
@@ -370,4 +370,14 @@ end
 
 
 
-puts final_pixels
+final_pixels.each do |row|
+  mapped_row = row.map do |tile|
+    case tile
+    when 255 then "*"
+    when 138 then "."
+    else
+      " "
+    end
+  end
+  puts mapped_row.join("")
+end
