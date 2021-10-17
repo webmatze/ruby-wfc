@@ -3,10 +3,10 @@
 require_relative "wfc/version"
 
 pixels = [
-  [255, 255, 0, 138],
-  [255, 255, 0, 138],
-  [0, 138, 0, 255],
-  [0, 138, 0, 255]
+  [255, 255, 255, 255],
+  [255, 0, 0, 0],
+  [255, 0, 138, 0],
+  [255, 0, 0, 0]
 ]
 input_size = [4, 4]
 OUTPUT_SIZE = [50, 50].freeze
@@ -25,9 +25,17 @@ class Pattern
   end
 end
 
-# WIP: Return original array as well as rotated by 90, 180 and 270 degrees in the form of tuples
+# Return original array as well as rotated by 90, 180 and 270 degrees in the form of tuples
 def get_all_rotations(pattern)
-  [pattern]
+  pattern_rotated1 = pattern.transpose.map(&:reverse)
+  pattern_rotated2 = pattern_rotated1.transpose.map(&:reverse)
+  pattern_rotated3 = pattern_rotated2.transpose.map(&:reverse)
+  [
+    pattern,
+    pattern_rotated1,
+    pattern_rotated2,
+    pattern_rotated3
+  ]
 end
 
 N = 2 # pattern size
