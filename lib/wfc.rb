@@ -1,14 +1,16 @@
 # frozen_string_literal: true
 
 require_relative "wfc/version"
+require "chunky_png"
 
 pixels = [
-  [255, 255, 255, 255],
-  [255, 0, 0, 0],
-  [255, 0, 138, 0],
-  [255, 0, 0, 0]
+  [255, 255, 255, 255, 255],
+  [255, 138, 138, 0, 0],
+  [255, 138, 138, 0, 0],
+  [255, 138, 138, 138, 38],
+  [255, 0, 0, 255, 255]
 ]
-input_size = [4, 4]
+input_size = [5, 5]
 OUTPUT_SIZE = [50, 50].freeze
 
 p(pixels)
@@ -377,15 +379,12 @@ coefficients.each do |i|
 end
 
 
-
-final_pixels.each do |row|
-  mapped_row = row.map do |tile|
-    case tile
-    when 255 then "*"
-    when 138 then "."
-    else
-      " "
-    end
+png = ChunkyPNG::Image.new(OUTPUT_SIZE[0], OUTPUT_SIZE[1], ChunkyPNG::Color::TRANSPARENT)
+final_pixels.each.with_index do |row, x|
+  row.each.with_index do |tile, y|
+    png[x, y] = ChunkyPNG::Color.grayscale(tile)
   end
-  puts mapped_row.join("")
 end
+png.save("result.png")
+
+puts "done."
