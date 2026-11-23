@@ -27,6 +27,8 @@ RSpec.describe Wfc::PatternExtractor do
     expect { described_class.new(sample, size: 3).call }.to raise_error(ArgumentError, /at least 3x3/)
     expect { described_class.new([[1, 2], [3]], size: 1) }.to raise_error(ArgumentError, /same length/)
     expect { described_class.new([], size: 1) }.to raise_error(ArgumentError)
+    expect { described_class.new(nil, size: 1) }.to raise_error(ArgumentError, /2D array/)
+    expect { described_class.new([1, 2], size: 1) }.to raise_error(ArgumentError, /2D array/)
     expect { described_class.new(sample, size: 0) }.to raise_error(ArgumentError)
   end
 end

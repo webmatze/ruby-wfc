@@ -13,6 +13,11 @@ module Wfc
     end
   end
 
-  # Raised when no attempt out of `max_attempts` finished without a contradiction.
+  # A contradiction found before anything random was decided: the patterns
+  # cannot fill a grid of this size at all, so trying again cannot help.
+  class UnsatisfiableError < ContradictionError; end
+
+  # Raised when no attempt out of `max_attempts` finished without a contradiction,
+  # or when the patterns cannot fill the requested size at all.
   class GenerationFailedError < Error; end
 end

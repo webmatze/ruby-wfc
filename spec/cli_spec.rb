@@ -29,4 +29,11 @@ RSpec.describe "exe/wfc" do
     expect(status.exitstatus).to eq(1)
     expect(stderr).to eq("wfc: invalid argument: -s 50\n")
   end
+
+  it "rejects arguments it would otherwise ignore" do
+    _stdout, stderr, status = run_cli("sample.png")
+
+    expect(status.exitstatus).to eq(1)
+    expect(stderr).to eq("wfc: needless argument: sample.png\n")
+  end
 end

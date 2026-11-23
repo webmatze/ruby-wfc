@@ -48,7 +48,9 @@ module Wfc
     end
 
     def validate_sample!(sample)
-      raise ArgumentError, "sample must be a non-empty 2D array" if sample.empty? || sample.first.empty?
+      unless sample.is_a?(Array) && !sample.empty? && sample.all?(Array) && !sample.first.empty?
+        raise ArgumentError, "sample must be a non-empty 2D array"
+      end
       raise ArgumentError, "sample rows must all have the same length" unless sample.map(&:length).uniq.one?
     end
   end

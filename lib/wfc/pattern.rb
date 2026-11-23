@@ -48,11 +48,11 @@ module Wfc
     end
 
     # The pixels this pattern shares with a neighbour placed `dx`/`dy` pixels away,
-    # row by row (in this pattern's coordinates).
+    # row by row (in this pattern's coordinates). Empty if the neighbour is too
+    # far away to share any pixel.
     def overlap(dx, dy)
-      x_range = [0, dx].max...[size, size + dx].min
-      y_range = [0, dy].max...[size, size + dy].min
-      y_range.map { |y| pixels[y][x_range] }
+      columns = shared(dx)
+      shared(dy).map { |y| pixels[y][columns] }
     end
 
     def ==(other)
@@ -68,5 +68,15 @@ module Wfc
       "#<Wfc::Pattern #{pixels.inspect}>"
     end
     alias inspect to_s
+
+    private
+
+    # The indices along one axis that a neighbour `offset` pixels away covers too.
+    # Without the clamp an offset beyond the pattern gives a range that Array#[]
+    # reads as nil or as counting from the end of the row.
+    def shared(offset)
+      offset = offset.clamp(-size, size)
+      [0, offset].max...[size, size + offset].min
+    end
   end
 end

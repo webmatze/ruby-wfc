@@ -27,8 +27,9 @@ def parse_options(argv)
     opts.on("-n", "--pattern-size N", Integer, "Pattern edge length (default: 2)") { |v| options[:pattern_size] = v }
     opts.on("--[no-]rotations", "Learn rotated patterns (default: on)") { |v| options[:rotations] = v }
     opts.on("--seed SEED", Integer, "Random seed for reproducible output") { |v| options[:seed] = v }
-    opts.on("--attempts N", Integer, "Retries after a contradiction (default: 10)") { |v| options[:attempts] = v }
+    opts.on("--attempts N", Integer, "Attempts before giving up (default: 10)") { |v| options[:attempts] = v }
   end.parse!(argv)
+  raise OptionParser::NeedlessArgument, argv.join(" ") unless argv.empty?
 
   options
 end

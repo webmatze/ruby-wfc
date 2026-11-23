@@ -18,7 +18,8 @@
   so the entropy was NaN and cells were effectively collapsed in scanline order.
 - A contradiction (a cell without any possible pattern) crashed with `NoMethodError`;
   it now raises `Wfc::ContradictionError` internally and generation is retried
-  (`max_attempts`), finally raising `Wfc::GenerationFailedError`.
+  (`max_attempts`), finally raising `Wfc::GenerationFailedError`. A contradiction before
+  the first random choice (`Wfc::UnsatisfiableError`) fails right away instead.
 - Patterns that can never be supported are removed before the first observation.
 
 ## [0.1.0] - 2021-10-14

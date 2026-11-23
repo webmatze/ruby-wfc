@@ -35,10 +35,15 @@ module Wfc
 
     # Runs observe/propagate until every cell holds exactly one pattern.
     # @raise [ContradictionError] if a cell runs out of possible patterns
+    #   (an UnsatisfiableError if that happens before the first random choice)
     # @return [self]
     def collapse!
-      ban_unsupported
-      propagate
+      begin
+        ban_unsupported
+        propagate
+      rescue ContradictionError => e
+        raise UnsatisfiableError, e.position
+      end
       while (cell = lowest_entropy_cell)
         observe(cell)
         propagate

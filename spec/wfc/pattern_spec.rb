@@ -63,5 +63,13 @@ RSpec.describe Wfc::Pattern do
       expect(big.overlaps?(shifted, 1, 1)).to be(true)
       expect(big.overlaps?(shifted, 1, 0)).to be(false)
     end
+
+    it "is true for patterns that are too far apart to share a pixel" do
+      other = described_class.new([[9, 9], [9, 9]])
+      [[2, 0], [3, 0], [-3, 0], [-4, 0], [0, 3], [0, -4], [5, 5]].each do |dx, dy|
+        expect(pattern.overlaps?(other, dx, dy)).to be(true)
+      end
+      expect(pattern.overlap(-3, 0)).to eq([[], []])
+    end
   end
 end

@@ -53,8 +53,38 @@ RSpec.describe Wfc::OverlappingModel do
     expect(blocks(result, 3) - big.patterns.map(&:pixels)).to be_empty
   end
 
+  it "can reproduce the sample itself, whatever the pattern size" do
+    [3, 5].each do |size|
+      big = described_class.new(sample, pattern_size: size, rotations: false)
+      result = big.generate(width: 5, height: 5, seed: 1)
+      expect(blocks(result, size) - big.patterns.map(&:pixels)).to be_empty
+    end
+  end
+
+  it "generates images smaller than a pattern" do
+    big = described_class.new(sample, pattern_size: 3)
+    result = big.generate(width: 2, height: 4, seed: 1)
+    expect(result.length).to eq(4)
+    expect(result).to all(have_attributes(length: 2))
+  end
+
   it "rejects a non-positive number of attempts" do
     expect { model.generate(width: 4, height: 4, max_attempts: 0) }.to raise_error(ArgumentError)
+    expect { model.generate(width: 4, height: 4, max_attempts: 1.5) }.to raise_error(ArgumentError)
+  end
+
+  it "rejects sizes that are not positive Integers" do
+    expect { model.generate(width: 0, height: 4) }.to raise_error(ArgumentError)
+    expect { model.generate(width: 4, height: nil) }.to raise_error(ArgumentError)
+  end
+
+  it "does not retry when the patterns can never fill the image" do
+    # Without rotations the 3x3 blocks of the sample cannot be continued beyond 5x5.
+    big = described_class.new(sample, pattern_size: 3, rotations: false)
+    expect(Wfc::Wave).to receive(:new).once.and_call_original
+
+    expect { big.generate(width: 12, height: 12, seed: 1, max_attempts: 5) }
+      .to raise_error(Wfc::GenerationFailedError, /cannot fill a 12x12 image/)
   end
 
   it "retries after contradictions and gives up eventually" do

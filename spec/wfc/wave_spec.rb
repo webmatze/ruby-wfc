@@ -24,7 +24,9 @@ RSpec.describe Wfc::Wave do
     patterns = [Wfc::Pattern.new([[0, 1], [0, 1]])]
     rules = Wfc::AdjacencyRules.new(patterns)
     wave = described_class.new(width: 3, height: 1, weights: [1], rules: rules, rng: Random.new(1))
-    expect { wave.collapse! }.to raise_error(Wfc::ContradictionError)
+    # Nothing random was decided yet, so it is the kind that is not worth retrying.
+    expect { wave.collapse! }.to raise_error(Wfc::UnsatisfiableError)
+    expect(Wfc::UnsatisfiableError).to be < Wfc::ContradictionError
   end
 
   it "validates its size" do

@@ -35,7 +35,7 @@ Or install it yourself as:
 | `-n`, `--pattern-size N` | `2` | edge length of the learned patterns |
 | `--[no-]rotations` | on | also learn rotated patterns |
 | `--seed SEED` | random | reproducible output |
-| `--attempts N` | `10` | retries after a contradiction |
+| `--attempts N` | `10` | attempts before giving up (an attempt ends at a contradiction) |
 
 From a checkout use `bundle exec exe/wfc ...`.
 
@@ -57,8 +57,8 @@ pixels = model.generate(width: 50, height: 50, seed: 1) # => pixels[y][x]
 ```
 
 Pixels can be any values that support `==` and `hash` (integers, symbols, colors, ...).
-If no contradiction-free result is found after `max_attempts` attempts,
-`Wfc::GenerationFailedError` is raised.
+If no contradiction-free result is found after `max_attempts` attempts, or the patterns
+cannot fill an image of the requested size at all, `Wfc::GenerationFailedError` is raised.
 
 PNG helpers (pixels are ChunkyPNG RGBA colors unless you map them with a block):
 
@@ -81,7 +81,9 @@ Wfc::PNG.save(grayscale_pixels, "out.png") { |v| ChunkyPNG::Color.grayscale(v) }
 3. `Wave` starts with every pattern possible in every cell, then repeatedly collapses the cell
    with the lowest Shannon entropy to one pattern (weighted by frequency) and propagates the
    consequences by counting supporters per pattern and direction.
-4. Each output pixel is the top-left pixel of the pattern chosen for its cell.
+4. Each output pixel is the top-left pixel of the pattern chosen for its cell. Only cells whose
+   pattern fits into the image are part of the wave, so the last N - 1 columns and rows are
+   taken from the rest of the patterns of the last cells.
 
 ## Development
 
