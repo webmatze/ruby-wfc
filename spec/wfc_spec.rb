@@ -2,10 +2,11 @@
 
 RSpec.describe Wfc do
   it "has a version number" do
-    expect(Wfc::VERSION).not_to be nil
+    expect(Wfc::VERSION).not_to be_nil
   end
 
-  it "does something useful" do
-    expect(false).to eq(true)
+  it "has no side effects when required" do
+    output = `#{RbConfig.ruby} -Ilib -e 'require "wfc"' 2>&1`
+    expect(output).to be_empty
   end
 end
