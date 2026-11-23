@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+require "wfc"
+require "wfc/png"
+
+# The grayscale sample the original prototype was built around.
+DEFAULT_SAMPLE = [
+  [255, 255, 255, 255, 255],
+  [255, 138, 138, 0, 0],
+  [255, 138, 138, 0, 0],
+  [255, 138, 138, 138, 38],
+  [255, 0, 0, 255, 255]
+].freeze
+
+def parse_options(argv)
+  options = { width: 50, height: 50, pattern_size: 2, rotations: true, output: "result.png", attempts: 10 }
+
+  OptionParser.new do |opts|
+    opts.banner = "Usage: wfc [options]"
+    opts.on("-i", "--input FILE", "Sample PNG (default: built-in 5x5 grayscale sample)") { |v| options[:input] = v }
+    opts.on("-o", "--output FILE", "Output PNG (default: result.png)") { |v| options[:output] = v }
+    opts.on("-s", "--size WxH", /\A\d+x\d+\z/, "Output size in pixels (default: 50x50)") do |v|
+      options[:width], options[:height] = v.split("x").map(&:to_i)
+    end
+    opts.on("-n", "--pattern-size N", Integer, "Pattern edge length (default: 2)") { |v| options[:pattern_size] = v }
+    opts.on("--[no-]rotations", "Learn rotated patterns (default: on)") { |v| options[:rotations] = v }
+    opts.on("--seed SEED", Integer, "Random seed for reproducible output") { |v| options[:seed] = v }
+    opts.on("--attempts N", Integer, "Attempts before giving up (default: 10)") { |v| options[:attempts] = v }
+  end.parse!(argv)
+  raise OptionParser::NeedlessArgument, argv.join(" ") unless argv.empty?
+
+  options
+end
+
+begin
+  options = parse_options(ARGV)
+
+  if options[:input]
+    sample = Wfc::PNG.load(options[:input])
+    to_color = nil
+  else
+    sample = DEFAULT_SAMPLE
+    to_color = ->(value) { ChunkyPNG::Color.grayscale(value) }
+  end
+
+  model = Wfc::OverlappingModel.new(sample, pattern_size: options[:pattern_size], rotations: options[:rotations])
+  pixels = model.generate(width: options[:width], height: options[:height],
+                          seed: options[:seed], max_attempts: options[:attempts])
+  Wfc::PNG.save(pixels, options[:output], &to_color)
+  puts "Wrote #{options[:width]}x#{options[:height]} image to #{options[:output]} (#{model.patterns.size} patterns)"
+rescue OptionParser::ParseError, Wfc::Error, ArgumentError, SystemCallError, ChunkyPNG::Exception => e
+  warn "wfc: #{e.message}"
+  exit 1
+end
