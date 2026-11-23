@@ -39,6 +39,9 @@ Or install it yourself as:
 
 From a checkout use `bundle exec exe/wfc ...`.
 
+The [`samples/`](samples/README.md) directory contains sample images with example commands
+and the results they produce.
+
 ### Ruby
 
 ```ruby
